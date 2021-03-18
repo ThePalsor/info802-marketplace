@@ -10,6 +10,11 @@ import ProductList from './components/ProductList';
 
 import Context from "./Context";
 
+import { loadStripe } from '@stripe/stripe-js';
+
+const stripePublicKey = "pk_test_51IWMLVB0L4ACn1yoUBuG6Jj0jkAJaAlLQgBFAKdnKmZ0JfATQS8WUu1vzumMSn4s51qna2ySfZKXixShegVTQs3C009jzw7NF3"
+const stripePromise = loadStripe(stripePublicKey);
+
 export default class App extends Component {
   constructor(props) {
     super(props);
@@ -25,11 +30,30 @@ export default class App extends Component {
     let user = localStorage.getItem("user");
     let cart = localStorage.getItem("cart");
 
-    const products = await axios.get('http://localhost:3001/products');
-    user = user ? JSON.parse(user) : null;
-    cart = cart? JSON.parse(cart) : {};
 
-    this.setState({ user,  products: products.data, cart });
+    axios({
+      url: 'https://us-central1-marketplace-info802.cloudfunctions.net/graphql ',
+      method: 'post',
+      data: {
+        query: `
+        query {
+          products {
+            name,
+            description,
+            price,
+            distance
+          }
+        }
+          `
+      }
+    }).then((result) => {
+      user = user ? JSON.parse(user) : null;
+      cart = cart ? JSON.parse(cart) : {};
+      console.log(result.data.data.products)
+
+      this.setState({ user, products: result.data.data.products, cart });
+    });
+
   }
 
   login = async (email, password) => {
@@ -40,7 +64,7 @@ export default class App extends Component {
       return { status: 401, message: 'Unauthorized' }
     })
 
-    if(res.status === 200) {
+    if (res.status === 200) {
       const { email } = jwt_decode(res.data.accessToken)
       const user = {
         email,
@@ -95,12 +119,14 @@ export default class App extends Component {
     this.setState({ cart });
   };
 
-  checkout = () => {
+  checkout = async () => {
+    /*
     if (!this.state.user) {
       this.routerRef.current.history.push("/login");
       return;
     }
-
+    */
+    /*
     const cart = this.state.cart;
 
     const products = this.state.products.map(p => {
@@ -114,8 +140,30 @@ export default class App extends Component {
       }
       return p;
     });
+    */
 
-    this.setState({ products });
+    // Get Stripe.js instance
+    const stripe = await stripePromise;
+
+    // Call your backend to create the Checkout Session
+    const response = await fetch('http://localhost:4242/create-checkout-session', { method: 'POST' });
+
+    const session = await response.json();
+
+    // When the customer clicks on the button, redirect them to Checkout.
+    const result = await stripe.redirectToCheckout({
+      sessionId: session.id,
+    });
+
+    if (result.error) {
+      // If `redirectToCheckout` fails due to a browser or network
+      // error, display the localized error message to your customer
+      // using `result.error.message`.
+    }
+
+
+
+    //this.setState({ products });
     this.clearCart();
   };
 
@@ -133,32 +181,31 @@ export default class App extends Component {
         }}
       >
         <Router ref={this.routerRef}>
-        <div className="App">
-          <nav
-            className="navbar container"
-            role="navigation"
-            aria-label="main navigation"
-          >
-            <div className="navbar-brand">
-              <b className="navbar-item is-size-4 ">TP Info802</b>
-              <label
-                role="button"
-                class="navbar-burger burger"
-                aria-label="menu"
-                aria-expanded="false"
-                data-target="navbarBasicExample"
-                onClick={e => {
-                  e.preventDefault();
-                  this.setState({ showMenu: !this.state.showMenu });
-                }}
-              >
-                <span aria-hidden="true"></span>
-                <span aria-hidden="true"></span>
-                <span aria-hidden="true"></span>
-              </label>
-            </div>
-              <div className={`navbar-menu ${
-                  this.state.showMenu ? "is-active" : ""
+          <div className="App">
+            <nav
+              className="navbar container"
+              role="navigation"
+              aria-label="main navigation"
+            >
+              <div className="navbar-brand">
+                <b className="navbar-item is-size-4 ">TP Info802</b>
+                <label
+                  role="button"
+                  class="navbar-burger burger"
+                  aria-label="menu"
+                  aria-expanded="false"
+                  data-target="navbarBasicExample"
+                  onClick={e => {
+                    e.preventDefault();
+                    this.setState({ showMenu: !this.state.showMenu });
+                  }}
+                >
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                </label>
+              </div>
+              <div className={`navbar-menu ${this.state.showMenu ? "is-active" : ""
                 }`}>
                 <Link to="/products" className="navbar-item">
                   Articles
@@ -174,7 +221,7 @@ export default class App extends Component {
                     className="tag is-primary"
                     style={{ marginLeft: "5px" }}
                   >
-                    { Object.keys(this.state.cart).length }
+                    {Object.keys(this.state.cart).length}
                   </span>
                 </Link>
                 {!this.state.user ? (
@@ -182,10 +229,10 @@ export default class App extends Component {
                     Connexion
                   </Link>
                 ) : (
-                  <Link to="/" onClick={this.logout} className="navbar-item">
-                    Deconnexion
-                  </Link>
-                )}
+                    <Link to="/" onClick={this.logout} className="navbar-item">
+                      Deconnexion
+                    </Link>
+                  )}
               </div>
             </nav>
             <Switch>

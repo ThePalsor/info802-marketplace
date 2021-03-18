@@ -9,7 +9,7 @@ const Cart = props => {
     <>
       <div className="hero is-primary">
         <div className="hero-body container">
-          <h4 className="title">My Cart</h4>
+          <h4 className="title">Mon Panier</h4>
         </div>
       </div>
       <br />
@@ -31,20 +31,20 @@ const Cart = props => {
                   onClick={props.context.clearCart}
                   className="button is-warning "
                 >
-                  Clear cart
+                  Vider le panier
                 </button>{" "}
                 <button
                   className="button is-success"
                   onClick={props.context.checkout}
                 >
-                  Checkout
+                  Payer
                 </button>
               </div>
             </div>
           </div>
         ) : (
           <div className="column">
-            <div className="title has-text-grey-light">No item in cart!</div>
+            <div className="title has-text-grey-light">La panier est vide</div>
           </div>
         )}
       </div>
