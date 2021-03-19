@@ -1,11 +1,8 @@
 import React, { Component } from "react";
 import { Switch, Route, Link, BrowserRouter as Router } from "react-router-dom";
 import axios from 'axios';
-import jwt_decode from 'jwt-decode';
 
-import AddProduct from './components/AddProduct';
 import Cart from './components/Cart';
-import Login from './components/Login';
 import ProductList from './components/ProductList';
 
 import Context from "./Context";
@@ -19,7 +16,6 @@ export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: null,
       cart: {},
       products: []
     };
@@ -27,9 +23,7 @@ export default class App extends Component {
   }
 
   async componentDidMount() {
-    let user = localStorage.getItem("user");
     let cart = localStorage.getItem("cart");
-
 
     axios({
       url: 'https://us-central1-marketplace-info802.cloudfunctions.net/graphql ',
@@ -41,56 +35,21 @@ export default class App extends Component {
             name,
             description,
             price,
+            weight,
             distance
           }
         }
           `
       }
     }).then((result) => {
-      user = user ? JSON.parse(user) : null;
       cart = cart ? JSON.parse(cart) : {};
       console.log(result.data.data.products)
 
-      this.setState({ user, products: result.data.data.products, cart });
+      this.setState({ products: result.data.data.products, cart });
     });
 
   }
 
-  login = async (email, password) => {
-    const res = await axios.post(
-      'http://localhost:3001/login',
-      { email, password },
-    ).catch((res) => {
-      return { status: 401, message: 'Unauthorized' }
-    })
-
-    if (res.status === 200) {
-      const { email } = jwt_decode(res.data.accessToken)
-      const user = {
-        email,
-        token: res.data.accessToken,
-        accessLevel: email === 'admin@example.com' ? 0 : 1
-      }
-
-      this.setState({ user });
-      localStorage.setItem("user", JSON.stringify(user));
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  logout = e => {
-    e.preventDefault();
-    this.setState({ user: null });
-    localStorage.removeItem("user");
-  };
-
-  addProduct = (product, callback) => {
-    let products = this.state.products.slice();
-    products.push(product);
-    this.setState({ products }, () => callback && callback());
-  };
 
   addToCart = cartItem => {
     let cart = this.state.cart;
@@ -120,50 +79,44 @@ export default class App extends Component {
   };
 
   checkout = async () => {
-    /*
-    if (!this.state.user) {
-      this.routerRef.current.history.push("/login");
-      return;
-    }
-    */
-    /*
-    const cart = this.state.cart;
 
-    const products = this.state.products.map(p => {
-      if (cart[p.name]) {
-        p.stock = p.stock - cart[p.name].amount;
-
-        axios.put(
-          `http://localhost:3001/products/${p.id}`,
-          { ...p },
-        )
-      }
-      return p;
-    });
-    */
-
-    // Get Stripe.js instance
     const stripe = await stripePromise;
 
-    // Call your backend to create the Checkout Session
-    const response = await fetch('http://localhost:4242/create-checkout-session', { method: 'POST' });
+    
+    var products = [];
+    var totalWeight = 0;
+    var maxDistance = 0;
+    Object.values(this.state.cart).forEach(element => {
+      var product = {};
+      product.name = element.id;
+      product.amount = element.product.price * 100; //Le prix est en centimes d'euros pour stripe
+      product.quantity = element.amount;
+      product.currency = 'eur';
+      totalWeight += product.quantity * element.product.weight;
+      maxDistance = element.product.distance > maxDistance ? element.product.distance : maxDistance;
+      products.push(product);
+    });
 
+    const data = JSON.stringify({products: products, weight: totalWeight, distance: maxDistance});
+    
+    const response = await fetch('https://stripe-server-tdelapierre.herokuapp.com/create-checkout-session', {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: data
+    });
+  
     const session = await response.json();
-
-    // When the customer clicks on the button, redirect them to Checkout.
+    
+    
     const result = await stripe.redirectToCheckout({
       sessionId: session.id,
     });
+    
 
-    if (result.error) {
-      // If `redirectToCheckout` fails due to a browser or network
-      // error, display the localized error message to your customer
-      // using `result.error.message`.
-    }
+    if (result.error) {}
 
-
-
-    //this.setState({ products });
     this.clearCart();
   };
 
@@ -174,8 +127,6 @@ export default class App extends Component {
           ...this.state,
           removeFromCart: this.removeFromCart,
           addToCart: this.addToCart,
-          login: this.login,
-          addProduct: this.addProduct,
           clearCart: this.clearCart,
           checkout: this.checkout
         }}
@@ -210,11 +161,6 @@ export default class App extends Component {
                 <Link to="/products" className="navbar-item">
                   Articles
                 </Link>
-                {this.state.user && this.state.user.accessLevel < 1 && (
-                  <Link to="/add-product" className="navbar-item">
-                    Ajouter un article
-                  </Link>
-                )}
                 <Link to="/cart" className="navbar-item">
                   Panier
                   <span
@@ -224,22 +170,12 @@ export default class App extends Component {
                     {Object.keys(this.state.cart).length}
                   </span>
                 </Link>
-                {!this.state.user ? (
-                  <Link to="/login" className="navbar-item">
-                    Connexion
-                  </Link>
-                ) : (
-                    <Link to="/" onClick={this.logout} className="navbar-item">
-                      Deconnexion
-                    </Link>
-                  )}
+
               </div>
             </nav>
             <Switch>
               <Route exact path="/" component={ProductList} />
-              <Route exact path="/login" component={Login} />
               <Route exact path="/cart" component={Cart} />
-              <Route exact path="/add-product" component={AddProduct} />
               <Route exact path="/products" component={ProductList} />
             </Switch>
           </div>
