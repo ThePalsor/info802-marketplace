@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "/info802-marketplace/static/css/main.5ecd60fb.chunk.css",
+    "main.js": "/info802-marketplace/static/js/main.7fc48c55.chunk.js",
+    "main.js.map": "/info802-marketplace/static/js/main.7fc48c55.chunk.js.map",
+    "runtime-main.js": "/info802-marketplace/static/js/runtime-main.447e63e8.js",
+    "runtime-main.js.map": "/info802-marketplace/static/js/runtime-main.447e63e8.js.map",
+    "static/css/2.98705a83.chunk.css": "/info802-marketplace/static/css/2.98705a83.chunk.css",
+    "static/js/2.c8a8d24a.chunk.js": "/info802-marketplace/static/js/2.c8a8d24a.chunk.js",
+    "static/js/2.c8a8d24a.chunk.js.map": "/info802-marketplace/static/js/2.c8a8d24a.chunk.js.map",
+    "index.html": "/info802-marketplace/index.html",
+    "precache-manifest.bfe9ed36628563776b928e0184ff6a77.js": "/info802-marketplace/precache-manifest.bfe9ed36628563776b928e0184ff6a77.js",
+    "service-worker.js": "/info802-marketplace/service-worker.js",
+    "static/css/2.98705a83.chunk.css.map": "/info802-marketplace/static/css/2.98705a83.chunk.css.map",
+    "static/css/main.5ecd60fb.chunk.css.map": "/info802-marketplace/static/css/main.5ecd60fb.chunk.css.map",
+    "static/js/2.c8a8d24a.chunk.js.LICENSE.txt": "/info802-marketplace/static/js/2.c8a8d24a.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.447e63e8.js",
+    "static/css/2.98705a83.chunk.css",
+    "static/js/2.c8a8d24a.chunk.js",
+    "static/css/main.5ecd60fb.chunk.css",
+    "static/js/main.7fc48c55.chunk.js"
+  ]
+}
