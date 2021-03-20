@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "b72849485e40bf455f2483ce35d7c8c5",
+    "revision": "f63315dcf24688f3729f7600d4d9d393",
     "url": "/info802-marketplace/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/info802-marketplace/static/css/2.98705a83.chunk.css"
   },
   {
-    "revision": "eaa7e4b72ee7b9dc293a",
+    "revision": "fe957ac3575e940751cc",
     "url": "/info802-marketplace/static/css/main.5ecd60fb.chunk.css"
   },
   {
@@ -20,8 +20,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/info802-marketplace/static/js/2.c8a8d24a.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "eaa7e4b72ee7b9dc293a",
-    "url": "/info802-marketplace/static/js/main.82f45612.chunk.js"
+    "revision": "fe957ac3575e940751cc",
+    "url": "/info802-marketplace/static/js/main.f33445c2.chunk.js"
   },
   {
     "revision": "b832163fa510f26596f1",
