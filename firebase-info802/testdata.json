@@ -1,0 +1,22 @@
+{
+    "products" : {
+      "pomme" : {
+        "name": "Une Pomme",
+        "description": "Faut vraiment une description ?",
+        "price": 1.0,
+        "distance": 500.0
+      },
+      "banane" : {
+        "name": "Une Banane",
+        "description": "Non vraiment c'est tout",
+        "price": 1.0,
+        "distance": 300.0
+      },
+      "stonks" : {
+        "name": "Un max de Stonks",
+        "description": "C'est cher mais ça vaut le coup !",
+        "price": 1000.0,
+        "distance": 0.0
+      }
+    }
+  }
